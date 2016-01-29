@@ -1,27 +1,39 @@
 var HTTPS = require('https');
-var cool = require('cool-ascii-faces');
-
+var nodeRequest = require('request');
 var botID = process.env.BOT_ID;
 
 function respond() {
   var request = JSON.parse(this.req.chunks[0]),
-      botRegex = /^\/cool guy$/;
-
+      botRegex = /\/giphy/i;
   if(request.text && botRegex.test(request.text)) {
+    var searchString = request.text.split(' ').slice(1).join('+');
+
+    nodeRequest('http://api.giphy.com/v1/gifs/search?q=' + searchString + '&api_key=dc6zaTOxFJmzC', function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        try {
+          var data = JSON.parse(body).data;
+          console.log(data);
+          var randomGif = Math.floor(data.length * Math.random());
+          console.log(randomGif);
+          postMessage(data[randomGif].images.fixed_height.url);
+        } catch (e) {
+          postMessage('no luck');
+        }
+      } else {
+        postMessage('no luck');
+      }
+    });
+
     this.res.writeHead(200);
-    postMessage();
     this.res.end();
   } else {
-    console.log("don't care");
     this.res.writeHead(200);
     this.res.end();
   }
 }
 
-function postMessage() {
-  var botResponse, options, body, botReq;
-
-  botResponse = cool();
+function postMessage(botResponse) {
+  var options, body, botReq;
 
   options = {
     hostname: 'api.groupme.com',
@@ -38,7 +50,6 @@ function postMessage() {
 
   botReq = HTTPS.request(options, function(res) {
       if(res.statusCode == 202) {
-        //neat
       } else {
         console.log('rejecting bad status code ' + res.statusCode);
       }
