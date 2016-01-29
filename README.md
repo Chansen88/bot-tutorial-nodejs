@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This project shows the capability of a bot to react to messages sent within a group.
+This project is modified to add /giphy functionally to a groupme. Similar to slack /giphy. 
 
 ## Contents
 
