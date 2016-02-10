@@ -7,23 +7,17 @@ function respond() {
       botRegex = /\/giphy/i;
   if(request.text && botRegex.test(request.text)) {
     var searchString = request.text.split(' ').slice(1).join('+');
-
     nodeRequest('http://api.giphy.com/v1/gifs/search?q=' + searchString + '&api_key=dc6zaTOxFJmzC', function (error, response, body) {
       if (!error && response.statusCode == 200) {
-        try {
-          var data = JSON.parse(body).data;
-          console.log(data);
+        var data = JSON.parse(body).data;
+        if (!data.length) {
           var randomGif = Math.floor(data.length * Math.random());
-          console.log(randomGif);
           postMessage(data[randomGif].images.fixed_height.url);
-        } catch (e) {
+        } else {
           postMessage('no luck');
         }
-      } else {
-        postMessage('no luck');
       }
     });
-
     this.res.writeHead(200);
     this.res.end();
   } else {
